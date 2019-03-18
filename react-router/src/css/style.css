@@ -1,0 +1,16 @@
+ .page1,.page2,.page3{
+    width: 200px;
+    height: 200px;
+    margin: 100px auto;
+    text-align: center;
+    line-height: 200px
+ }
+ .page1{
+    background: red
+ }
+ .page2{
+    background: yellow
+ }
+ .page3{
+   background: blue
+ }
