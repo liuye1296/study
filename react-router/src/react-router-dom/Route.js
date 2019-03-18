@@ -14,11 +14,25 @@ export default class Route extends Component {
             <Consumer>
                 {(state) => {
                     const { path, component: Component, exact = false } = this.props;
-                    const pathname = state.location.pathname
+                    const pathname = state.location.pathname || ''
                     // extract = true  严格匹配  
-                    const reg = pathToRegexp(path, [], { end: exact })
+                    let keys = []
+                    const reg = pathToRegexp(path, keys, { end: exact })
+                    keys = keys.map(res => res.name)
+                    let data = pathname.match(reg);
+                    const [url, ...datas] = data || [];
                     if (reg.test(pathname)) {
-                        return <Component></Component>
+                        const props = {
+                            location: state.location,
+                            history: state.history,
+                            macth: {
+                                params: keys.reduce((obj, current, index) => {
+                                    obj[current] = datas[index];
+                                    return obj
+                                }, {})
+                            }
+                        }
+                        return <Component {...props}></Component>
                     }
                     return null
                 }}

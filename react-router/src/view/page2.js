@@ -4,10 +4,16 @@
     describe: 
 **/
 import React, { Component } from 'react'
+import { Link } from '../react-router-dom';
 export default class page2 extends Component {
     render() {
+        //console.log
         return (
-            <div className="page2">我是page2</div>
+            <div>
+                <Link to="/1">222</Link>
+                <div className="page2">我是page2</div>
+            </div>
+
         )
     }
 }
