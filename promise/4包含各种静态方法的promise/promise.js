@@ -108,7 +108,7 @@ class Promise {
                         this.error = error
                         reject(error)
                     }
-                    
+
                 })
                 _this.rejectCallBackList.push(() => {
                     const resolveValue = rejectFn(_this.error)
@@ -122,6 +122,76 @@ class Promise {
             }
         });
         return promise
+    }
+    // fn1().catch(()=>{})
+    catch(reject) {
+        return this.then(null, reject)
+    }
+    // fn1().wait(2000).then(res=>console.log(res),err=>console.log(err))
+    wait(time) {
+        return this.then(res => {
+            return new this.constructor(function (resolve, reject) {
+                setTimeout(function () { resolve(res); }, time)
+            })
+        }, err => {
+            return new this.constructor(function (resolve, reject) {
+                setTimeout(function () { reject(err); }, time)
+            })
+        })
+    }
+    // fn1().finally(()=>{}) 不管成功还是失败都会执行这个
+    finally(fn) {
+        return this.then(res => {
+            return fn(res), res;
+        }, err => {
+            throw fn(err), err;
+        })
+    }
+    static resolve(data) {
+        return new this.constructor((resolve, reject) => {
+            resolve(data)
+        })
+    }
+    static reject(data) {
+        return new this.constructor((resolve, reject) => {
+            reject(data)
+        })
+    }
+    static all(array) {
+        return new this.constructor((resolve, reject) => {
+            if (Object.prototype.toString.call(array) === '[object Array]') {
+                let i = 0;
+                let backList = new Array(array.length), isOK = false;
+                array.forEach((fn, index) => {
+                    if (fn instanceof Promise) {
+                        if (isOK) return
+                        try {
+                            fn().then(res => {
+                                i++;
+                                backList[index] = res
+                                if (i === array.length) {
+                                    resolve(backList)
+                                }
+                            }, err => {
+                                isOK = true
+                                reject(err)
+                            })
+                        } catch (error) {
+                            isOK = true
+                            reject(err)
+                        }
+                    } else {
+                        i++
+                        backList[index] = fn
+                        if (i === array.length) {
+                            resolve(backList)
+                        }
+                    }
+                })
+            } else {
+                reject('参数不是数组')
+            }
+        })
     }
 }
 
@@ -137,12 +207,12 @@ new Promise((resolve, reject) => {
         }, 0);
     })
 }, (err) => {
-    console.log('异常'+err)
+    console.log('异常' + err)
     return new Promise((resolve, reject) => {
         setTimeout(() => {
             resolve(err + 22 + 3)
         }, 0);
     })
 }).then().then().then(res => {
-    console.log('正常'+res)
-}, err => { console.log(err)})
+    console.log('正常' + res)
+}, err => { console.log(err) })
