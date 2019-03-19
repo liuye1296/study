@@ -46,7 +46,9 @@ class Promise {
         }
 
     }
-    //实例函数 接受两个函数参数 成功的函数 失败的函数
+    /**
+     * 实例函数 接受两个函数参数 resolve reject
+    */
     then(resolveFn, rejectFn) {
         // 兼容 .then().then() 这种写法 穿透
         if (Object.prototype.toString.call(resolveFn) !== '[object Function]') {
@@ -123,11 +125,16 @@ class Promise {
         });
         return promise
     }
-    // fn1().catch(()=>{})
+    /**
+     * fn1().catch(()=>{})
+     */
     catch(reject) {
         return this.then(null, reject)
     }
-    // fn1().wait(2000).then(res=>console.log(res),err=>console.log(err))
+    /**
+     *  等待一段时间在执行  入参 : time  毫秒单位
+     *  fn1().wait(2000).then(res=>console.log(res),err=>console.log(err))
+    */
     wait(time) {
         return this.then(res => {
             return new this.constructor(function (resolve, reject) {
@@ -139,7 +146,10 @@ class Promise {
             })
         })
     }
-    // fn1().finally(()=>{}) 不管成功还是失败都会执行这个
+    /**
+     * Promise 无论成功还是失败都会执行的
+     * fn1().finally(()=>{}) 不管成功还是失败都会执行这个
+     */
     finally(fn) {
         return this.then(res => {
             return fn(res), res;
@@ -147,16 +157,24 @@ class Promise {
             throw fn(err), err;
         })
     }
-    static resolve(data) {
-        return new this.constructor((resolve, reject) => {
-            resolve(data)
-        })
+    /**
+     * 入参  Promise 对象 or 普通对象
+     * 出参 状态是reject的 resolve
+     */
+    static resolve(value) {
+        return value instanceof this ? value : new this.constructor(resolve => { resolve(value) })
     }
-    static reject(data) {
-        return new this.constructor((resolve, reject) => {
-            reject(data)
-        })
+    /**
+     * 入参 Promise 对象 or 普通对象
+     * 出参 状态是reject的 Promise
+     */
+    static reject(value) {
+        return value instanceof this ? value : new this.constructor((resolve, reject) => { reject(value) })
     }
+    /**
+     * 入参 Promise 类型数组 
+     * 出参 所有Promise 都成功就会 resolve([]) 返回对应的结果 否则  reject 并不在执行后面的Promise
+     */
     static all(array) {
         return new this.constructor((resolve, reject) => {
             if (Object.prototype.toString.call(array) === '[object Array]') {
