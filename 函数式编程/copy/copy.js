@@ -13,7 +13,7 @@
 //     ];
 
 //     while (loopList.length) {
-//         // 深度优先
+//         // 深度优先 先进先出（栈） 深度优先  先进后出(列队) 广度优先
 //         const node = loopList.pop();
 //         const parent = node.parent;
 //         const key = node.key;
